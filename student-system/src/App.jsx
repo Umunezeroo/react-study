@@ -564,35 +564,208 @@
 // }
 
 // export default App
-import { BrowserRouter,Routes,Route } from "react-router-dom";
-import { StudentProvider } from "./StudentContext";
-import Header from "./Header";
-import AddStudent from "./AddStudent";
-import StudentList from "./StudentList";
-import"./App.css";
 
 
-function StudentDashboard(){
-    return(
-        <div className="container">
-            <Header/>
-            <Routes>
-                <Route path="/" element={
-                    <>
-                    <AddStudent/>
-            <StudentList/>
-                    </>
-                }></Route>
-            </Routes>
+
+//{{{{another page}}}}
+
+// import { BrowserRouter,Routes,Route } from "react-router-dom";
+// import { StudentProvider } from "./StudentContext";
+// import Header from "./Header";
+// import AddStudent from "./AddStudent";
+// import StudentList from "./StudentList";
+// import"./App.css";
+
+
+// function StudentDashboard(){
+//     return(
+//         <div className="container">
+//             <Header/>
+//             <Routes>
+//                 <Route path="/" element={
+//                     <>
+//                     <AddStudent/>
+//             <StudentList/>
+//                     </>
+//                 }></Route>
+//             </Routes>
             
-        </div>)}
-export default function App(){
-    return(
-        <BrowserRouter>
-        <StudentProvider>
-            <StudentDashboard/>
-            </StudentProvider>
-        </BrowserRouter>
+//         </div>)}
+// export default function App(){
+//     return(
+//         <BrowserRouter>
+//         <StudentProvider>
+//             <StudentDashboard/>
+//             </StudentProvider>
+//         </BrowserRouter>
         
-    );
+//     );
+// }
+
+
+// //frontend
+// import { useState } from "react";
+// import"./App.css";
+
+// function App(){
+//     const [students,setStudents]=useState([
+//         {id:1,name:"Alice",marks:43},
+//         {id:2,name:"Ange",marks:43},
+//         {id:3,name:"Anna",marks:44},
+//     ]);
+//     const[message,setMessage]=useState("select student to view details.");
+//     function viewStudent(id){
+//         const student=students.find((item)=>item.id===id);
+//  if(student){
+//         setMessage(
+//             `${student.name}scored ${student.marks}marks`
+//         )
+//     }
+//     }
+
+//     function deleteStudent(id){
+//         const student=students.find((item)=>
+//             item.id===id
+//         );
+//         if(!student)return;
+//         setStudents((currentStudents)=>currentStudents.filter((item)=>item.id!==id))
+//         setMessage(`${student.name}was deleted`);
+
+//         return(
+//             <div className="container">
+//                 <h1>Student management System</h1>
+//                 <p className="message">{message}</p>
+//                 <table>
+//                     <thead>
+//                         <tr>
+//                             <th>ID</th>
+//                             <th>NAME</th>
+//                             <TH>MARKS</TH>
+//                             <TH>Actions</TH>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         {students.map((student)=>(
+//                             <tr key={student.id}>
+//                                 <td>{student.id}</td>
+//                                  <td>{student.name}</td>
+//                                   <td>{student.marks}</td>
+//                                   <td>
+//                                     <button onClick={()=>viewStudent(student.id)}>view</button>
+//                                   </td>
+//                             </tr>
+//                         ))}
+//                     </tbody>
+//                 </table>
+//             </div>
+//         )
+//     }
+   
+// }
+
+
+import { useState } from "react";
+import"./App.css"
+function App(){
+const [students,setStudents]=useState([
+    {id:1,name:"Grace",marks:34},
+    {id:2,name:"Qace",marks:34},
+    {id:3,name:"Neema",marks:84}
+])
+const [name,setName]=useState("")
+const [search,setSearch]=useState("")
+const [message,setMessage]=useState("manage your registered students")
+//add new students
+
+function addStudent(event){
+    event.preventDefault();
+    const studentName=name.trim()
+    if(!studentName){
+        setMessage("please enter a student name")
+        return
+    }
+    const newStudent={
+        id:Date.now()
+        ,name:studentName,
+        marks:0
+    }
+    setStudents((currentStudents)=>[
+        ...currentStudents,newStudent
+    ])
+    setName("")
+    setMessage(`${studentName} was added successfully`)
 }
+
+//view students selected
+function viewStudent(id){
+    const student=students.find((item)=>item.id===id)
+    if(student){
+        setMessage(` Student: ${student.name}| marks:${student.marks}`)
+    }
+}
+//update student marks of selescted student
+function updateMarks(id)
+{
+ const student=students.find((item)=>item.id===id)
+ if(!student) return;
+ const enterMarks=window.prompt(`Enter marks for ${student.name}`, String(student.marks))
+ if (enterMarks===null||enterMarks.trim()==="")return
+ const newMarks=Number(enterMarks)
+ if(!Number.isFinite(newMarks)||newMarks<0||newMarks>100){
+    setMessage("Marks must be between 0 and 100")
+    return
+ }
+ setStudents((currentStudents)=>currentStudents.map((item)=>item.id===id?
+{...item,marks: newMarks}: item))
+setMessage(`Marks updated for ${student.name}`)
+
+}
+//deletestudent
+
+function deleteStudent(id){
+    const student=students.find((item)=>item.id===id)
+    if(!student)return;
+    setStudents((currentStudents)=>currentStudents.filter((item)=>item.id!==id))
+    setMessage(`${student.name} was deleted`)
+}
+//search for student
+const filteredStudents=students.filter((student)=>student.name.toLowerCase().includes(search.toLowerCase()))
+return(
+    <div className="container">
+        <h1>Student management system</h1>
+        <p className="message">{message}</p>
+        <form onSubmit={addStudent}className="student-form">
+            <input type="text"placeholder="enter student name"value={name}  onChange={(e)=>setName(e.target.value)}/>
+            <button type="submit">Add student</button>
+        </form>
+        <input type="text"placeholder="enter std name"value={search} onChange={(e)=>setSearch(e.target.value)} />
+        <p>total registered students:{students.length}</p>
+        <div className="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student name</th>
+                        <th>Marks</th>
+                          <th>actions</th>
+                        </tr>
+                </thead>
+                <tbody>
+                    {filteredStudents.map((student)=>(
+                        <tr key={student.id}>
+                            <td>{student.name}</td>
+                            <td>{student.marks}</td>
+                       
+                        <td className="actions"> 
+<button onClick={()=>viewStudent(student.id)}>view</button>
+                        <button onClick={()=>updateMarks(student.id)} className="update">update</button>
+                        <button onClick={()=>deleteStudent(student.id)} className="delete">delete</button>
+                        </td>
+                         </tr>  ))}
+                             
+                </tbody>
+            </table>
+        </div>
+        {filteredStudents.length===0&&(<p>no students founnd</p>)}
+</div>
+    )}
+export default App;
